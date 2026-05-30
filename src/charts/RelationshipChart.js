@@ -325,7 +325,11 @@ function clicked(event, d) {
     new CustomEvent('pedigree:person-selected', {
       bubbles: true,
       composed: true,
-      detail: {grampsId: d.profile?.gramps_id},
+      detail: {
+        grampsId: d.profile?.gramps_id,
+        ctrlKey: event.ctrlKey || event.metaKey,
+        altKey: event.altKey,
+      },
     })
   )
 }

@@ -11,6 +11,7 @@ import './GrampsjsViewHourglassChart.js'
 import './GrampsjsViewFanChart.js'
 import './GrampsjsViewRelationshipChart.js'
 import {fireEvent} from '../util.js'
+import '../components/GrampsjsPersonPanel.js'
 import {
   chartFanIconPath,
   hourglassIconPath,
@@ -49,6 +50,8 @@ export class GrampsjsViewTree extends GrampsjsView {
       view: {type: String},
       _history: {type: Array},
       _currentTabId: {type: Number},
+      _panelOpen: {type: Boolean},
+      _panelGrampsId: {type: String},
     }
   }
 
@@ -59,6 +62,8 @@ export class GrampsjsViewTree extends GrampsjsView {
     this._history = this.grampsId ? [this.grampsId] : []
     this._currentTabId = getTreeViewTabIndex(DEFAULT_TREE_VIEW)
     this._appliedTreeDefaultView = null
+    this._panelOpen = false
+    this._panelGrampsId = ''
   }
 
   shouldUpdate(changed) {
@@ -95,7 +100,17 @@ export class GrampsjsViewTree extends GrampsjsView {
       ${this._currentTabId === 2 ? this._renderHourglassTree() : ''}
       ${this._currentTabId === 3 ? this._renderRelationshipChart() : ''}
       ${this._currentTabId === 4 ? this._renderFan() : ''}
+      <grampsjs-person-panel
+        ?open=${this._panelOpen}
+        .grampsId=${this._panelGrampsId}
+        .appState=${this.appState}
+        @person-panel:close=${this._closePanel}
+      ></grampsjs-person-panel>
     `
+  }
+
+  _closePanel() {
+    this._panelOpen = false
   }
 
   _handleTabChange(e) {
@@ -280,8 +295,21 @@ export class GrampsjsViewTree extends GrampsjsView {
   }
 
   async _selectPerson(event) {
-    const {grampsId} = event.detail
+    const {grampsId, ctrlKey, altKey} = event.detail
+    // Click modifiers:
+    //   Ctrl/Cmd+click → panel only (bypass the default re-center)
+    //   Option/Alt+click → default only (re-center, no panel)
+    //   plain click    → default + panel
+    if (ctrlKey) {
+      this._panelGrampsId = grampsId
+      this._panelOpen = true
+      return
+    }
     this.grampsId = grampsId
+    if (!altKey) {
+      this._panelGrampsId = grampsId
+      this._panelOpen = true
+    }
   }
 }
 

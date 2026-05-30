@@ -8,6 +8,7 @@ export class GrampsjsViewPerson extends GrampsjsViewObject {
   static get properties() {
     return {
       homePersonDetails: {type: Object},
+      narrow: {type: Boolean},
       _timelineData: {type: Array},
       _timelineLoading: {type: Boolean},
     }
@@ -16,6 +17,7 @@ export class GrampsjsViewPerson extends GrampsjsViewObject {
   constructor() {
     super()
     this.homePersonDetails = {}
+    this.narrow = false
     this._className = 'person'
     this._timelineData = []
     this._timelineLoading = false
@@ -82,6 +84,7 @@ export class GrampsjsViewPerson extends GrampsjsViewObject {
         .timelineData=${this._timelineData}
         ?edit="${this.edit}"
         ?canEdit="${this.canEdit}"
+        ?narrow="${this.narrow}"
       ></grampsjs-person>
     `
   }

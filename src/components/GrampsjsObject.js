@@ -342,6 +342,32 @@ export class GrampsjsObject extends GrampsjsAppStateMixin(LitElement) {
             display: none;
           }
         }
+
+        /*
+        Compact single-column layout for when the object is rendered inside a
+        narrow container (e.g. the family-tree side panel) rather than a full
+        page. Opt-in via the [narrow] attribute; higher specificity than the
+        viewport @media rules above so it wins regardless of window width.
+        */
+        :host([narrow]) #picture {
+          float: none;
+          text-align: left;
+          margin-left: 0;
+          margin-right: 0;
+        }
+
+        :host([narrow]) .sections {
+          width: 100%;
+          padding-right: 0;
+        }
+
+        :host([narrow]) .row {
+          display: block;
+        }
+
+        :host([narrow]) div.toc {
+          display: none;
+        }
       `,
     ]
   }
@@ -355,6 +381,7 @@ export class GrampsjsObject extends GrampsjsAppStateMixin(LitElement) {
       _objectEndpoint: {type: String},
       _objectIcon: {type: String},
       _showReferences: {type: Boolean},
+      narrow: {type: Boolean, reflect: true},
     }
   }
 
@@ -366,6 +393,7 @@ export class GrampsjsObject extends GrampsjsAppStateMixin(LitElement) {
     this._objectsName = 'Objects'
     this._objectIcon = ''
     this._showReferences = true
+    this.narrow = false
     this._sectionObserver = null
     this._currentVisibleSection = ''
   }
@@ -409,7 +437,7 @@ export class GrampsjsObject extends GrampsjsAppStateMixin(LitElement) {
   }
 
   get tocSidebar() {
-    return this.appState.screenSize === 'large'
+    return this.appState.screenSize === 'large' && !this.narrow
   }
 
   render() {

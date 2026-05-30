@@ -165,7 +165,11 @@ function TreeChartCore(
       new CustomEvent('pedigree:person-selected', {
         bubbles: true,
         composed: true,
-        detail: {grampsId: d.data?.person?.gramps_id},
+        detail: {
+          grampsId: d.data?.person?.gramps_id,
+          ctrlKey: event.ctrlKey || event.metaKey,
+          altKey: event.altKey,
+        },
       })
     )
   }
