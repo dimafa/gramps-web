@@ -36,6 +36,7 @@ export class GrampsjsPerson extends GrampsjsObject {
     return {
       homePersonDetails: {type: Object},
       timelineData: {type: Array},
+      hideTreeButton: {type: Boolean},
       _showFamilyEvents: {type: Boolean},
       _showRelatedEvents: {type: Boolean},
     }
@@ -49,6 +50,7 @@ export class GrampsjsPerson extends GrampsjsObject {
     this._objectIcon = 'person'
     this._showReferences = false
     this.timelineData = []
+    this.hideTreeButton = false
     this._showFamilyEvents = false
     this._showRelatedEvents = false
   }
@@ -64,8 +66,8 @@ export class GrampsjsPerson extends GrampsjsObject {
       </h2>
       ${this._renderBirth()} ${this._renderDeath()} ${this._renderRelation()}
       <p class="button-list">
-        ${this._renderTreeBtn()} ${this._renderDnaBtn()}
-        ${this._renderExternalSearchBtn()}
+        ${this.hideTreeButton ? '' : this._renderTreeBtn()}
+        ${this._renderDnaBtn()} ${this._renderExternalSearchBtn()}
       </p>
     `
   }
