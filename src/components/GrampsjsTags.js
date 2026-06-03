@@ -27,6 +27,16 @@ export class GrampsjsTags extends GrampsjsAppStateMixin(LitElement) {
           margin-bottom: 7px;
         }
 
+        :host([compact]) h4 {
+          margin-top: 0;
+          margin-bottom: 4px;
+        }
+
+        :host([compact]) .tags {
+          margin-bottom: 0;
+          padding: 0;
+        }
+
         .tags {
           clear: left;
           margin-bottom: 15px;
@@ -82,6 +92,7 @@ export class GrampsjsTags extends GrampsjsAppStateMixin(LitElement) {
       edit: {type: Boolean},
       hideTags: {type: Array},
       noHeading: {type: Boolean},
+      compact: {type: Boolean, reflect: true},
     }
   }
 
@@ -91,6 +102,7 @@ export class GrampsjsTags extends GrampsjsAppStateMixin(LitElement) {
     this.edit = false
     this.hideTags = []
     this.noHeading = false
+    this.compact = false
   }
 
   render() {

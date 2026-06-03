@@ -374,7 +374,7 @@ export class GrampsjsObject extends GrampsjsAppStateMixin(LitElement) {
         :host([inpanel]) h2 {
           font-size: 22px;
           margin-top: 0;
-          margin-bottom: 12px;
+          margin-bottom: 8px;
           display: flex;
           align-items: center;
           min-height: 120px;
@@ -382,7 +382,16 @@ export class GrampsjsObject extends GrampsjsAppStateMixin(LitElement) {
 
         :host([inpanel]) .vitals {
           clear: left;
+          padding-top: 0;
+          line-height: 1.35;
+        }
+
+        :host([inpanel]) .tags {
           padding-top: 8px;
+        }
+
+        :host([inpanel]) .content-wrapper {
+          margin-top: 8px;
         }
 
         /* In the constrained collapsed panel, a very long place would overflow
@@ -397,17 +406,14 @@ export class GrampsjsObject extends GrampsjsAppStateMixin(LitElement) {
         :host([narrow]) .sections {
           width: 100%;
           padding-right: 0;
-          gap: 1.25rem;
-        }
-
-        :host([narrow]) .content-wrapper {
-          margin-top: 16px;
+          gap: 0.875rem;
         }
 
         :host([narrow]) .sections h3 {
           font-size: 18px;
-          margin-bottom: 1rem;
-          padding-bottom: 8px;
+          margin-top: 0;
+          margin-bottom: 0.6rem;
+          padding-bottom: 6px;
         }
 
         :host([narrow]) .row {
@@ -669,6 +675,7 @@ export class GrampsjsObject extends GrampsjsAppStateMixin(LitElement) {
     return html` <grampsjs-tags
       .data=${this.data?.extended?.tags || []}
       ?edit="${this.edit}"
+      ?compact="${this.inPanel}"
       .appState="${this.appState}"
       @tag:new="${this._handleNewTag}"
     ></grampsjs-tags>`
