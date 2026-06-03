@@ -258,6 +258,14 @@ export class GrampsjsObject extends GrampsjsAppStateMixin(LitElement) {
           flex-wrap: wrap;
         }
 
+        /* Each birth/death vital on its own line, wrapping as a whole unit
+           (the date/place inside a span never breaks mid-content). Applies in
+           both the full page and the narrow side panel. */
+        .vitals .event {
+          display: block;
+          white-space: nowrap;
+        }
+
         div.tags {
           padding-top: 1em;
         }
@@ -366,6 +374,13 @@ export class GrampsjsObject extends GrampsjsAppStateMixin(LitElement) {
         :host([narrow]) .vitals {
           clear: left;
           padding-top: 8px;
+        }
+
+        /* In the constrained panel, a very long place would overflow with
+           nowrap, so truncate it gracefully (full value stays on /person). */
+        :host([narrow]) .vitals .event {
+          overflow: hidden;
+          text-overflow: ellipsis;
         }
 
         :host([narrow]) .sections {
