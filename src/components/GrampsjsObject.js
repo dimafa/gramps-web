@@ -366,6 +366,17 @@ export class GrampsjsObject extends GrampsjsAppStateMixin(LitElement) {
         :host([narrow]) .sections {
           width: 100%;
           padding-right: 0;
+          gap: 1.25rem;
+        }
+
+        :host([narrow]) .content-wrapper {
+          margin-top: 16px;
+        }
+
+        :host([narrow]) .sections h3 {
+          font-size: 18px;
+          margin-bottom: 1rem;
+          padding-bottom: 8px;
         }
 
         :host([narrow]) .row {
