@@ -476,7 +476,9 @@ export class GrampsjsObject extends GrampsjsAppStateMixin(LitElement) {
 
       <div style="clear:left;"></div>
 
-      <div class="tags">${this.renderTags()}</div>
+      ${this.data?.extended?.tags?.length || this.edit
+        ? html`<div class="tags">${this.renderTags()}</div>`
+        : ''}
 
       <div class="content-wrapper">
         <div class="sections">${this.renderSections()}</div>
