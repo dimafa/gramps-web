@@ -296,6 +296,13 @@ export class GrampsjsViewTree extends GrampsjsView {
 
   async _selectPerson(event) {
     const {grampsId, ctrlKey, altKey} = event.detail
+    // On small screens the panel can only render as a full-screen overlay
+    // (see the max-width:768px rule in GrampsjsPersonPanel), which is too
+    // disruptive — never open it there, just re-center the tree.
+    if (this._isSmallScreen()) {
+      this.grampsId = grampsId
+      return
+    }
     // Click modifiers:
     //   Ctrl/Cmd+click → panel only (bypass the default re-center)
     //   Option/Alt+click → default only (re-center, no panel)
@@ -310,6 +317,12 @@ export class GrampsjsViewTree extends GrampsjsView {
       this._panelGrampsId = grampsId
       this._panelOpen = true
     }
+  }
+
+  // Matches the panel's full-width breakpoint in GrampsjsPersonPanel. Evaluated
+  // per click so it tracks viewport changes (rotation, resize) live.
+  _isSmallScreen() {
+    return window.matchMedia('(max-width: 768px)').matches
   }
 }
 
