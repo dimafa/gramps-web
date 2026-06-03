@@ -11,6 +11,7 @@ export class GrampsjsViewPerson extends GrampsjsViewObject {
       narrow: {type: Boolean},
       hideTreeButton: {type: Boolean},
       hideExternalSearchButton: {type: Boolean},
+      inPanel: {type: Boolean},
       _timelineData: {type: Array},
       _timelineLoading: {type: Boolean},
     }
@@ -22,6 +23,7 @@ export class GrampsjsViewPerson extends GrampsjsViewObject {
     this.narrow = false
     this.hideTreeButton = false
     this.hideExternalSearchButton = false
+    this.inPanel = false
     this._className = 'person'
     this._timelineData = []
     this._timelineLoading = false
@@ -91,6 +93,7 @@ export class GrampsjsViewPerson extends GrampsjsViewObject {
         ?narrow="${this.narrow}"
         ?hideTreeButton="${this.hideTreeButton}"
         ?hideExternalSearchButton="${this.hideExternalSearchButton}"
+        ?inPanel="${this.inPanel}"
       ></grampsjs-person>
     `
   }

@@ -230,6 +230,7 @@ export class GrampsjsPersonPanel extends GrampsjsAppStateMixin(LitElement) {
             ?narrow=${!this._expanded}
             ?hideTreeButton=${true}
             ?hideExternalSearchButton=${true}
+            ?inPanel=${true}
             .appState=${this.appState}
           ></grampsjs-view-person>
         </div>

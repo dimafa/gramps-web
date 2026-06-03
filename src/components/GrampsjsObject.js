@@ -258,11 +258,11 @@ export class GrampsjsObject extends GrampsjsAppStateMixin(LitElement) {
           flex-wrap: wrap;
         }
 
-        /* Each birth/death vital on its own line, wrapping as a whole unit
-           (the date/place inside a span never breaks mid-content). Applies in
-           both the full page and the narrow side panel. */
+        /* Vitals flow inline so they share a line when there's room, but each
+           event wraps as a whole unit (white-space nowrap → no mid-content
+           break like "Great / Falls"). Applies on the full page and panel. */
         .vitals .event {
-          display: block;
+          display: inline-block;
           white-space: nowrap;
         }
 
@@ -357,7 +357,13 @@ export class GrampsjsObject extends GrampsjsAppStateMixin(LitElement) {
         page. Opt-in via the [narrow] attribute; higher specificity than the
         viewport @media rules above so it wins regardless of window width.
         */
-        :host([narrow]) #picture {
+        /* Compact contact-card header in the side panel (both collapsed and
+           expanded): avatar floats left with the name centered beside it and
+           the vitals cleared below. The full /person page is unaffected (it
+           floats the avatar right). Only the body layout below tracks
+           [narrow], so expanding widens the sections without moving the
+           avatar. */
+        :host([inpanel]) #picture {
           float: left;
           text-align: left;
           margin-left: 0;
@@ -365,7 +371,7 @@ export class GrampsjsObject extends GrampsjsAppStateMixin(LitElement) {
           margin-bottom: 12px;
         }
 
-        :host([narrow]) h2 {
+        :host([inpanel]) h2 {
           font-size: 22px;
           margin-top: 0;
           margin-bottom: 12px;
@@ -374,14 +380,16 @@ export class GrampsjsObject extends GrampsjsAppStateMixin(LitElement) {
           min-height: 120px;
         }
 
-        :host([narrow]) .vitals {
+        :host([inpanel]) .vitals {
           clear: left;
           padding-top: 8px;
         }
 
-        /* In the constrained panel, a very long place would overflow with
-           nowrap, so truncate it gracefully (full value stays on /person). */
+        /* In the constrained collapsed panel, a very long place would overflow
+           with nowrap, so truncate it gracefully (full value stays on the
+           person page; the wider expanded panel has room and is exempt). */
         :host([narrow]) .vitals .event {
+          max-width: 100%;
           overflow: hidden;
           text-overflow: ellipsis;
         }
@@ -423,6 +431,7 @@ export class GrampsjsObject extends GrampsjsAppStateMixin(LitElement) {
       _objectIcon: {type: String},
       _showReferences: {type: Boolean},
       narrow: {type: Boolean, reflect: true},
+      inPanel: {type: Boolean, reflect: true},
     }
   }
 
@@ -435,6 +444,7 @@ export class GrampsjsObject extends GrampsjsAppStateMixin(LitElement) {
     this._objectIcon = ''
     this._showReferences = true
     this.narrow = false
+    this.inPanel = false
     this._sectionObserver = null
     this._currentVisibleSection = ''
   }
@@ -582,7 +592,7 @@ export class GrampsjsObject extends GrampsjsAppStateMixin(LitElement) {
       <grampsjs-img
         handle="${obj.handle}"
         size="200"
-        displayHeight="${this.narrow ? 120 : 200}"
+        displayHeight="${this.inPanel ? 120 : 200}"
         .rect="${ref.rect || []}"
         square
         circle
