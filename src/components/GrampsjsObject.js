@@ -350,17 +350,22 @@ export class GrampsjsObject extends GrampsjsAppStateMixin(LitElement) {
         viewport @media rules above so it wins regardless of window width.
         */
         :host([narrow]) #picture {
-          float: none;
+          float: left;
           text-align: left;
           margin-left: 0;
-          margin-right: 0;
-          margin-bottom: 20px;
+          margin-right: 20px;
+          margin-bottom: 12px;
         }
 
         :host([narrow]) h2 {
           font-size: 22px;
-          margin-top: 4px;
-          margin-bottom: 16px;
+          margin-top: 0;
+          margin-bottom: 12px;
+        }
+
+        :host([narrow]) .vitals {
+          clear: left;
+          padding-top: 8px;
         }
 
         :host([narrow]) .sections {
