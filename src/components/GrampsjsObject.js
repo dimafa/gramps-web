@@ -369,6 +369,9 @@ export class GrampsjsObject extends GrampsjsAppStateMixin(LitElement) {
           font-size: 22px;
           margin-top: 0;
           margin-bottom: 12px;
+          display: flex;
+          align-items: center;
+          min-height: 120px;
         }
 
         :host([narrow]) .vitals {

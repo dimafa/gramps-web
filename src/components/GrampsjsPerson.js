@@ -67,7 +67,7 @@ export class GrampsjsPerson extends GrampsjsObject {
           ?edit="${this.edit}"
           gender="${this.data.gender}"
         ></grampsjs-edit-gender>
-        ${this._displayName()}
+        <span class="display-name">${this._displayName()}</span>
       </h2>
       <div class="vitals">
         ${this._renderBirth()} ${this._renderDeath()} ${this._renderRelation()}
