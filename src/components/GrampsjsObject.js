@@ -354,6 +354,13 @@ export class GrampsjsObject extends GrampsjsAppStateMixin(LitElement) {
           text-align: left;
           margin-left: 0;
           margin-right: 0;
+          margin-bottom: 20px;
+        }
+
+        :host([narrow]) h2 {
+          font-size: 22px;
+          margin-top: 4px;
+          margin-bottom: 16px;
         }
 
         :host([narrow]) .sections {
@@ -539,7 +546,7 @@ export class GrampsjsObject extends GrampsjsAppStateMixin(LitElement) {
       <grampsjs-img
         handle="${obj.handle}"
         size="200"
-        displayHeight="200"
+        displayHeight="${this.narrow ? 120 : 200}"
         .rect="${ref.rect || []}"
         square
         circle
