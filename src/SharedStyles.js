@@ -80,6 +80,7 @@ export const sharedStyles = css`
 
   h4 {
     font-size: 16px;
+    margin-block: var(--grampsjs-h4-margin-block, 1.33em);
   }
 
   h4.label {

@@ -363,6 +363,14 @@ export class GrampsjsObject extends GrampsjsAppStateMixin(LitElement) {
            floats the avatar right). Only the body layout below tracks
            [narrow], so expanding widens the sections without moving the
            avatar. */
+        /* Tighten the sub-section h4 headings (Parents, Siblings, Birth Name,
+           Attributes, ...) in the panel. These live in nested components, so
+           drive their margin via an inherited custom property rather than
+           reaching across shadow boundaries. */
+        :host([inpanel]) {
+          --grampsjs-h4-margin-block: 0.5em;
+        }
+
         :host([inpanel]) #picture {
           float: left;
           text-align: left;
