@@ -46,25 +46,29 @@ export class GrampsjsObjectPreview extends GrampsjsAppStateMixin(LitElement) {
           overscroll-behavior: contain;
         }
 
+        /* The hosted view adds its own page margin (GrampsjsView :host) on top
+           of any padding here; zero it out so the preview is tightly framed. */
         .card > grampsjs-view-person {
           display: block;
-          padding: 4px 20px 20px;
+          margin: 0;
+          padding: 10px 12px 12px;
         }
 
+        /* Zero-height sticky overlay so the open button floats in the top-right
+           corner without pushing the page content down. */
         .toolbar {
           position: sticky;
           top: 0;
-          z-index: 2;
+          height: 0;
+          z-index: 3;
           display: flex;
           justify-content: flex-end;
-          padding: 6px 6px 0;
-          background-color: var(
-            --grampsjs-object-preview-background,
-            var(--md-sys-color-surface-container-high, #fff)
-          );
+          pointer-events: none;
         }
 
         .toolbar md-icon-button {
+          pointer-events: auto;
+          margin: 2px;
           --md-icon-button-icon-size: 20px;
         }
       `,
