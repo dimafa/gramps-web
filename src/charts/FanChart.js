@@ -375,10 +375,38 @@ export function FanChart(
     )
   }
 
+  function hovered(event, d) {
+    if (!d.data?.person?.gramps_id) {
+      return
+    }
+    dispatchEvent(
+      new CustomEvent('pedigree:person-hovered', {
+        bubbles: true,
+        composed: true,
+        detail: {
+          grampsId: d.data.person.gramps_id,
+          target: event.currentTarget,
+        },
+      })
+    )
+  }
+
+  function unhovered() {
+    dispatchEvent(
+      new CustomEvent('pedigree:person-unhovered', {
+        bubbles: true,
+        composed: true,
+        detail: {},
+      })
+    )
+  }
+
   cell
     .filter(d => arcVisible(d.data))
     .style('cursor', 'pointer')
     .on('click', clicked)
+    .on('mouseenter', hovered)
+    .on('mouseleave', unhovered)
 
   cell
     .append('title')

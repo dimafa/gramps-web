@@ -329,6 +329,33 @@ function clicked(event, d) {
     })
   )
 }
+
+function hovered(event, d) {
+  if (!d.profile?.gramps_id) {
+    return
+  }
+  dispatchEvent(
+    new CustomEvent('pedigree:person-hovered', {
+      bubbles: true,
+      composed: true,
+      detail: {
+        grampsId: d.profile.gramps_id,
+        target: event.currentTarget,
+      },
+    })
+  )
+}
+
+function unhovered() {
+  dispatchEvent(
+    new CustomEvent('pedigree:person-unhovered', {
+      bubbles: true,
+      composed: true,
+      detail: {},
+    })
+  )
+}
+
 function remasterChart(
   divhidden,
   targetsvg,
@@ -540,6 +567,8 @@ function remasterChart(
     .filter(d => d.nodetype === 'person')
     .style('cursor', canEdit ? 'default' : 'pointer')
     .on('click', canEdit ? null : clicked)
+    .on('mouseenter', hovered)
+    .on('mouseleave', unhovered)
 
   if (canEdit) {
     appendAddPersonButton(

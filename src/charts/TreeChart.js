@@ -170,6 +170,32 @@ function TreeChartCore(
     )
   }
 
+  function hovered(event, d) {
+    if (!d.data?.person?.gramps_id) {
+      return
+    }
+    dispatchEvent(
+      new CustomEvent('pedigree:person-hovered', {
+        bubbles: true,
+        composed: true,
+        detail: {
+          grampsId: d.data.person.gramps_id,
+          target: event.currentTarget,
+        },
+      })
+    )
+  }
+
+  function unhovered() {
+    dispatchEvent(
+      new CustomEvent('pedigree:person-unhovered', {
+        bubbles: true,
+        composed: true,
+        detail: {},
+      })
+    )
+  }
+
   node
     .append('rect')
     .filter(d => d.data.person)
@@ -339,6 +365,8 @@ function TreeChartCore(
   node
     .style('cursor', canEdit ? 'default' : 'pointer')
     .on('click', canEdit ? null : clicked)
+    .on('mouseenter', hovered)
+    .on('mouseleave', unhovered)
 
   return [xOffset, yOffset, width, height, boxWidth + 2 * padding]
 }

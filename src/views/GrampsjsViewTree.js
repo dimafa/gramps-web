@@ -1,10 +1,12 @@
 import {css, html} from 'lit'
+import tippy from 'tippy.js'
 
 import '@material/web/tabs/tabs'
 import '@material/web/tabs/primary-tab'
 
 import {mdiFamilyTree} from '@mdi/js'
 import {GrampsjsView} from './GrampsjsView.js'
+import '../components/GrampsjsObjectPreview.js'
 import './GrampsjsViewDescendantChart.js'
 import './GrampsjsViewTreeChart.js'
 import './GrampsjsViewHourglassChart.js'
@@ -18,6 +20,26 @@ import {
   relationshipGraphIconPath,
 } from '../icons.js'
 import {DEFAULT_TREE_VIEW, getTreeViewTabIndex} from '../treeDefaults.js'
+
+// Strip Tippy's default tooltip chrome so the preview card's own surface shows.
+let previewThemeInjected = false
+function injectPreviewTheme() {
+  if (previewThemeInjected) {
+    return
+  }
+  previewThemeInjected = true
+  const style = document.createElement('style')
+  style.textContent = `
+    .tippy-box[data-theme~='grampsjs-preview'] {
+      background-color: transparent;
+      box-shadow: none;
+    }
+    .tippy-box[data-theme~='grampsjs-preview'] > .tippy-content {
+      padding: 0;
+    }
+  `
+  document.head.appendChild(style)
+}
 
 export class GrampsjsViewTree extends GrampsjsView {
   static get styles() {
@@ -59,6 +81,13 @@ export class GrampsjsViewTree extends GrampsjsView {
     this._history = this.grampsId ? [this.grampsId] : []
     this._currentTabId = getTreeViewTabIndex(DEFAULT_TREE_VIEW)
     this._appliedTreeDefaultView = null
+    this._previewCard = null
+    this._previewTippy = null
+    this._previewTarget = null
+    this._previewShowTimer = null
+    this._previewHideTimer = null
+    this._onPersonHovered = this._onPersonHovered.bind(this)
+    this._onPersonUnhovered = this._onPersonUnhovered.bind(this)
   }
 
   shouldUpdate(changed) {
@@ -253,6 +282,87 @@ export class GrampsjsViewTree extends GrampsjsView {
       'pedigree:person-selected',
       this._selectPerson.bind(this)
     )
+    window.addEventListener('pedigree:person-hovered', this._onPersonHovered)
+    window.addEventListener(
+      'pedigree:person-unhovered',
+      this._onPersonUnhovered
+    )
+  }
+
+  disconnectedCallback() {
+    window.removeEventListener('pedigree:person-hovered', this._onPersonHovered)
+    window.removeEventListener(
+      'pedigree:person-unhovered',
+      this._onPersonUnhovered
+    )
+    clearTimeout(this._previewShowTimer)
+    clearTimeout(this._previewHideTimer)
+    if (this._previewTippy) {
+      this._previewTippy.destroy()
+      this._previewTippy = null
+    }
+    super.disconnectedCallback()
+  }
+
+  // Lazily create the shared hover-preview popover (a Tippy singleton whose
+  // reference rect is repointed to whichever node is currently hovered).
+  _ensurePreview() {
+    if (this._previewTippy) {
+      return
+    }
+    injectPreviewTheme()
+    this._previewCard = document.createElement('grampsjs-object-preview')
+    this._previewCard.appState = this.appState
+    this._previewCard.addEventListener('mouseenter', () =>
+      clearTimeout(this._previewHideTimer)
+    )
+    this._previewCard.addEventListener('mouseleave', () =>
+      this._schedulePreviewHide()
+    )
+    this._previewTippy = tippy(document.body, {
+      content: this._previewCard,
+      trigger: 'manual',
+      interactive: true,
+      interactiveBorder: 16,
+      arrow: false,
+      placement: 'right',
+      offset: [0, 14],
+      maxWidth: 'none',
+      appendTo: () => document.body,
+      theme: 'grampsjs-preview',
+    })
+  }
+
+  _onPersonHovered(event) {
+    const {grampsId, target} = event.detail
+    if (!grampsId) {
+      return
+    }
+    clearTimeout(this._previewHideTimer)
+    clearTimeout(this._previewShowTimer)
+    this._previewTarget = target
+    this._previewShowTimer = setTimeout(() => {
+      this._ensurePreview()
+      this._previewCard.appState = this.appState
+      this._previewCard.grampsId = grampsId
+      this._previewTippy.setProps({
+        getReferenceClientRect: () =>
+          this._previewTarget.getBoundingClientRect(),
+      })
+      this._previewTippy.show()
+    }, 350)
+  }
+
+  _onPersonUnhovered() {
+    clearTimeout(this._previewShowTimer)
+    this._schedulePreviewHide()
+  }
+
+  _schedulePreviewHide() {
+    clearTimeout(this._previewHideTimer)
+    this._previewHideTimer = setTimeout(() => {
+      this._previewTippy?.hide()
+    }, 200)
   }
 
   update(changed) {
