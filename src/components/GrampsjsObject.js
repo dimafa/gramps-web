@@ -258,6 +258,14 @@ export class GrampsjsObject extends GrampsjsAppStateMixin(LitElement) {
           flex-wrap: wrap;
         }
 
+        /* Vitals flow inline so they share a line when there's room, but each
+           event wraps as a whole unit (white-space nowrap → no mid-content
+           break like "Great / Falls"). Applies on the full page and panel. */
+        .vitals .event {
+          display: inline-block;
+          white-space: nowrap;
+        }
+
         div.tags {
           padding-top: 1em;
         }
@@ -342,6 +350,87 @@ export class GrampsjsObject extends GrampsjsAppStateMixin(LitElement) {
             display: none;
           }
         }
+
+        /*
+        Compact single-column layout for when the object is rendered inside a
+        narrow container (e.g. the family-tree side panel) rather than a full
+        page. Opt-in via the [narrow] attribute; higher specificity than the
+        viewport @media rules above so it wins regardless of window width.
+        */
+        /* Compact contact-card header in the side panel (both collapsed and
+           expanded): avatar floats left with the name centered beside it and
+           the vitals cleared below. The full /person page is unaffected (it
+           floats the avatar right). Only the body layout below tracks
+           [narrow], so expanding widens the sections without moving the
+           avatar. */
+        /* Tighten the sub-section h4 headings (Parents, Siblings, Birth Name,
+           Attributes, ...) in the panel. These live in nested components, so
+           drive their margin via an inherited custom property rather than
+           reaching across shadow boundaries. */
+        :host([inpanel]) {
+          --grampsjs-h4-margin-block: 0.5em;
+        }
+
+        :host([inpanel]) #picture {
+          float: left;
+          text-align: left;
+          margin-left: 0;
+          margin-right: 20px;
+          margin-bottom: 12px;
+        }
+
+        :host([inpanel]) h2 {
+          font-size: 22px;
+          margin-top: 0;
+          margin-bottom: 8px;
+          display: flex;
+          align-items: center;
+          min-height: 120px;
+        }
+
+        :host([inpanel]) .vitals {
+          clear: left;
+          padding-top: 0;
+          line-height: 1.35;
+        }
+
+        :host([inpanel]) .tags {
+          padding-top: 8px;
+        }
+
+        :host([inpanel]) .content-wrapper {
+          margin-top: 8px;
+        }
+
+        /* In the constrained collapsed panel, a very long place would overflow
+           with nowrap, so truncate it gracefully (full value stays on the
+           person page; the wider expanded panel has room and is exempt). */
+        :host([narrow]) .vitals .event {
+          max-width: 100%;
+          overflow: hidden;
+          text-overflow: ellipsis;
+        }
+
+        :host([narrow]) .sections {
+          width: 100%;
+          padding-right: 0;
+          gap: 0.875rem;
+        }
+
+        :host([narrow]) .sections h3 {
+          font-size: 18px;
+          margin-top: 0;
+          margin-bottom: 0.6rem;
+          padding-bottom: 6px;
+        }
+
+        :host([narrow]) .row {
+          display: block;
+        }
+
+        :host([narrow]) div.toc {
+          display: none;
+        }
       `,
     ]
   }
@@ -355,6 +444,8 @@ export class GrampsjsObject extends GrampsjsAppStateMixin(LitElement) {
       _objectEndpoint: {type: String},
       _objectIcon: {type: String},
       _showReferences: {type: Boolean},
+      narrow: {type: Boolean, reflect: true},
+      inPanel: {type: Boolean, reflect: true},
     }
   }
 
@@ -366,6 +457,8 @@ export class GrampsjsObject extends GrampsjsAppStateMixin(LitElement) {
     this._objectsName = 'Objects'
     this._objectIcon = ''
     this._showReferences = true
+    this.narrow = false
+    this.inPanel = false
     this._sectionObserver = null
     this._currentVisibleSection = ''
   }
@@ -409,7 +502,7 @@ export class GrampsjsObject extends GrampsjsAppStateMixin(LitElement) {
   }
 
   get tocSidebar() {
-    return this.appState.screenSize === 'large'
+    return this.appState.screenSize === 'large' && !this.narrow
   }
 
   render() {
@@ -425,7 +518,9 @@ export class GrampsjsObject extends GrampsjsAppStateMixin(LitElement) {
 
       <div style="clear:left;"></div>
 
-      <div class="tags">${this.renderTags()}</div>
+      ${this.data?.extended?.tags?.length || this.edit
+        ? html`<div class="tags">${this.renderTags()}</div>`
+        : ''}
 
       <div class="content-wrapper">
         <div class="sections">${this.renderSections()}</div>
@@ -511,7 +606,7 @@ export class GrampsjsObject extends GrampsjsAppStateMixin(LitElement) {
       <grampsjs-img
         handle="${obj.handle}"
         size="200"
-        displayHeight="200"
+        displayHeight="${this.inPanel ? 120 : 200}"
         .rect="${ref.rect || []}"
         square
         circle
@@ -588,6 +683,7 @@ export class GrampsjsObject extends GrampsjsAppStateMixin(LitElement) {
     return html` <grampsjs-tags
       .data=${this.data?.extended?.tags || []}
       ?edit="${this.edit}"
+      ?compact="${this.inPanel}"
       .appState="${this.appState}"
       @tag:new="${this._handleNewTag}"
     ></grampsjs-tags>`

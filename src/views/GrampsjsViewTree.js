@@ -88,6 +88,7 @@ export class GrampsjsViewTree extends GrampsjsView {
     this._previewHideTimer = null
     this._onPersonHovered = this._onPersonHovered.bind(this)
     this._onPersonUnhovered = this._onPersonUnhovered.bind(this)
+    this._onPreviewNav = this._onPreviewNav.bind(this)
   }
 
   shouldUpdate(changed) {
@@ -297,6 +298,10 @@ export class GrampsjsViewTree extends GrampsjsView {
     )
     clearTimeout(this._previewShowTimer)
     clearTimeout(this._previewHideTimer)
+    if (this._previewResizeObserver) {
+      this._previewResizeObserver.disconnect()
+      this._previewResizeObserver = null
+    }
     if (this._previewTippy) {
       this._previewTippy.destroy()
       this._previewTippy = null
@@ -319,6 +324,17 @@ export class GrampsjsViewTree extends GrampsjsView {
     this._previewCard.addEventListener('mouseleave', () =>
       this._schedulePreviewHide()
     )
+    // The card is portalled into document.body, so nav events fired from the
+    // hosted person view never reach the app router. Catch them here and
+    // re-fire from inside the app tree.
+    this._previewCard.addEventListener('nav', this._onPreviewNav)
+    // The person view loads asynchronously and grows the card after it is
+    // first positioned; reposition Popper whenever the card resizes so a tall
+    // card stays clamped within the viewport.
+    this._previewResizeObserver = new ResizeObserver(() => {
+      this._previewTippy?.popperInstance?.update()
+    })
+    this._previewResizeObserver.observe(this._previewCard)
     this._previewTippy = tippy(document.body, {
       content: this._previewCard,
       trigger: 'manual',
@@ -330,7 +346,22 @@ export class GrampsjsViewTree extends GrampsjsView {
       maxWidth: 'none',
       appendTo: () => document.body,
       theme: 'grampsjs-preview',
+      popperOptions: {
+        modifiers: [
+          {name: 'flip', options: {fallbackPlacements: ['left']}},
+          {
+            name: 'preventOverflow',
+            options: {altAxis: true, tether: false, padding: 12},
+          },
+        ],
+      },
     })
+  }
+
+  _onPreviewNav(event) {
+    event.stopPropagation()
+    this._previewTippy?.hide()
+    fireEvent(this, 'nav', event.detail)
   }
 
   _onPersonHovered(event) {

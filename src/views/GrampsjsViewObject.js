@@ -70,6 +70,7 @@ export class GrampsjsViewObject extends GrampsjsView {
       grampsId: {type: String},
       edit: {type: Boolean},
       editDialogContent: {type: String},
+      hideFab: {type: Boolean},
       _data: {type: Object},
       _className: {type: String},
       _saveButton: {type: Boolean},
@@ -80,6 +81,7 @@ export class GrampsjsViewObject extends GrampsjsView {
     super()
     this.edit = false
     this.editDialogContent = ''
+    this.hideFab = false
     this._data = {}
     this._className = ''
     this._saveButton = false
@@ -107,7 +109,7 @@ export class GrampsjsViewObject extends GrampsjsView {
     }
     return html`
       ${this.renderElement()}
-      ${this.canEdit && !this.edit ? this.renderFab() : ''}
+      ${this.canEdit && !this.edit && !this.hideFab ? this.renderFab() : ''}
       ${this.editDialogContent}
     `
   }
